@@ -96,8 +96,43 @@ update a single field.
   fields of a class and can be used to access the fields irrespective of their access modifiers. Spring provides the
   ReflectionUtils class for handling reflection and working with the Reflection API.
 * **Queries for partial update**:
- A point to note here is that in step 2, we have used the save method to applying the patch. This method updates
-all the columns in the table. For large objects with a lot of fields, this can have a performance impact.
-To avoid this, we can implement queries for partial updates. These queries can target frequently updated columns.
+  A point to note here is that in step 2, we have used the save method to applying the patch. This method updates
+  all the columns in the table. For large objects with a lot of fields, this can have a performance impact.
+  To avoid this, we can implement queries for partial updates. These queries can target frequently updated columns.
 
-  
+      @Modifying
+      @Query("update Player p set p.titles = :titles where p.id = :id")
+      void updateTitles(@Param("id") int id, @Param("titles") int titles);
+  The query must be used with the @Modifying annotation to execute the UPDATE query. The @Param annotation binds the
+  method parameters to the query. This method will only change a single column of the table unlike the save method which
+  updates all the columns of the table.
+
+#### **_@DeleteMapping_**
+
+The HTTP DELETE request deletes a record. The primary key of the record to be deleted can be sent as part of the request
+URI or the record itself can be sent as part of the request body. The client will send a DELETE request to our REST
+service with the id of the player to be deleted. The REST Service deletes the record and responds with the 200 (OK)
+status code to the client.
+
+      public String deletePlayer(int id) {            
+         repo.deleteById(id);
+        return "Deleted player with id: "+id;
+      }
+
+## **_Exception Handling_**
+
+When the client sends a request to fetch, update or delete a player record not found in the database, an internal server
+error occurs. The information contained in the response is verbose and of interest to developers only.
+![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/ex.png)
+
+#### **_@ControllerAdvice_**
+
+A best practice in exception handling, is to have centralized exception handlers that can be used by all controllers in
+the REST API. Since exception handling is a cross cutting concern, Spring provides the @ControllerAdvice annotation.
+This annotation intercepts requests going to the controller and responses coming from controllers.
+
+The @ControllerAdvice annotation can be used as an interceptor of exceptions thrown by methods annotated with
+@RequestMapping or any of its shortcut annotations. The exception handling logic is contained in the global exception
+handler which handles all exceptions thrown by the PlayerController.
+
+![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/CostumeError.png)
