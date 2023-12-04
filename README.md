@@ -95,3 +95,9 @@ update a single field.
   Reflection API is used to examine and modify fields, methods, and classes at runtime. It allows access to the private
   fields of a class and can be used to access the fields irrespective of their access modifiers. Spring provides the
   ReflectionUtils class for handling reflection and working with the Reflection API.
+* **Queries for partial update**:
+ A point to note here is that in step 2, we have used the save method to applying the patch. This method updates
+all the columns in the table. For large objects with a lot of fields, this can have a performance impact.
+To avoid this, we can implement queries for partial updates. These queries can target frequently updated columns.
+
+  
