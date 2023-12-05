@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ReflectionUtils;
 
+import static org.hibernate.sql.ast.SqlTreeCreationLogger.LOGGER;
+
 @Service
 public class PlayerService {
 
@@ -28,7 +30,6 @@ public class PlayerService {
 
         if(tempPlayer.isEmpty())
             throw new PlayerNotFoundException("Player with id {"+ id +"} not found");
-
         return tempPlayer.get();
     }
 

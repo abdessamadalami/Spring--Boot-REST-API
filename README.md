@@ -33,7 +33,7 @@ role in modern application development, particularly in web-based, distributed, 
 
 Jackson handles the conversion between JSON and POJOs by making use of the getter and setter methods of a class. To
 convert a JSON object to POJO
-![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/Pojo.png)
+![](imges/Pojo.png)
 
 #### @RestController
 
@@ -47,7 +47,7 @@ service. The dispatcher servlet handles the request and if the request has JSON 
 it to Java objects. The request is mapped to a controller which calls service layer methods. The service layer delegates
 the call to repository and returns the data as POJO. The MessageConverter converts the data to JSON and it is sent back
 to the client. The flow of request is shown below:
-![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/restarc.png)
+![](imges/restarc.png)
 
 The @GetMapping annotation maps HTTP GET requests to controller methods. It is a shortcut for:
 @RequestMapping(method = RequestMethod.GET)
@@ -55,7 +55,7 @@ The @GetMapping annotation maps HTTP GET requests to controller methods. It is a
 * @PathVariable: Since there is a path variable in the endpoint, we need to bind it with a method parameter. The
   @PathVariable annotation binds the path variable {id} from the URL to the method parameter id. By default, both the
   names must be the same for the binding to work.
-  ![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/path.png)
+  ![](imges/path.png)
 
 #### @PostMapping
 
@@ -123,16 +123,65 @@ status code to the client.
 
 When the client sends a request to fetch, update or delete a player record not found in the database, an internal server
 error occurs. The information contained in the response is verbose and of interest to developers only.
-![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/ex.png)
+![](imges/ex.png)
 
-#### **_@ControllerAdvice_**
+## _@ControllerAdvice_
 
 A best practice in exception handling, is to have centralized exception handlers that can be used by all controllers in
 the REST API. Since exception handling is a cross cutting concern, Spring provides the @ControllerAdvice annotation.
 This annotation intercepts requests going to the controller and responses coming from controllers.
 
-The @ControllerAdvice annotation can be used as an interceptor of exceptions thrown by methods annotated with
+The @**ControllerAdvice** annotation can be used as an interceptor of exceptions thrown by methods annotated with
 @RequestMapping or any of its shortcut annotations. The exception handling logic is contained in the global exception
 handler which handles all exceptions thrown by the PlayerController.
+![](imges/CostumeError.png)
 
-![](/nfs/homes/ael-oual/Downloads/Spring-REST/imges/CostumeError.png)
+### **_@ExceptionHandler_**
+
+The @ExceptonHandler annotation on a method, marks it as a method that will handle exceptions. Spring automatically
+checks all methods marked with this annotation when an exception is thrown. If it finds a method whose input type
+matches the exception thrown, the method will be executed.
+
+    @ExceptonHandler
+    public ResponseEntity<PlayerErrorResponse> playerNotFoundHandler (
+    PlayerNotFoundException exception,
+    HttpServletRequest req)
+    {
+        PlayerErrorResponse error = new PlayerErrorResponse(
+          ZonedDateTime.now(), // 
+          HttpStatus.NOT_FOUND.value(),
+          // getRequestURI() method on the HttpServletRequest object to get the path at which the exception occurred.
+          req.getRequestURI(),
+          ex.getMessage());
+    // The ResponseEntity class provides a variety of constructors to create an object using the status code, header and body or a combination of the three
+    return new ResponseEntity<> (error, HttpStatus.NOT_FOUND);
+    }
+
+## **_Generic exception handler_**
+
+any unhandled exceptions thrown within your controllers or services will be intercepted and processed by this handler
+
+    @ExceptionHandler
+    public ResponseEntity<PlayerErrorResponse> genericHandler (
+    Exception ex,
+    HttpServletRequest req){
+
+    PlayerErrorResponse error = new PlayerErrorResponse(
+                                               ZonedDateTime.now(),
+                                               HttpStatus.BAD_REQUEST.value(),
+                                               req.getRequestURI(),
+                                               ex.getMessage());
+    
+    return new ResponseEntity<> (error, HttpStatus.BAD_REQUEST);
+    }
+
+Here, we are sending the birthDate in the wrong format. An exception is also thrown when the body is missing from the
+POST or PUT request.
+
+    {
+    "name": "Federer",
+    "nationality": "Switzerland",
+    "birthDate": "22/05/84",
+    "titles": 151
+    }
+![](imges/post.png)

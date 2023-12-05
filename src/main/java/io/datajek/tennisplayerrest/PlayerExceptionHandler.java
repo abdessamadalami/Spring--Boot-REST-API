@@ -17,7 +17,7 @@ public class PlayerExceptionHandler {
                 ZonedDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
                 req.getRequestURI(),
-                exception.getMessage());
+                exception.getMessage() + "playerNotFoundHandler");
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
@@ -30,7 +30,7 @@ public class PlayerExceptionHandler {
                 ZonedDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
                 req.getRequestURI(),
-                exception.getMessage());
+                exception.getMessage() + " genericHandler ");
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
